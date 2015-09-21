@@ -33,7 +33,16 @@ def build_aid_chain(chain_name='aid'):
         chain.append_rule(rule)
 
 
+def add_aid_chain_to_input(chain_name='aid', position=0):
+    jump_to_aid = iptc.Rule()
+    jump_to_aid.create_target(chain_name)
+
+    input_chain = iptc.Chain(table, 'INPUT')
+    input_chain.insert_rule(jump_to_aid, position)
 
 
+def generate_aid_list(chain_name='aid', input_chain_position=0):
+    build_aid_chain(chain_name)
+    add_aid_chain_to_input(chain_name, input_chain_position)
 
-build_aid_chain()
+generate_aid_list()
