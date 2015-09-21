@@ -15,21 +15,23 @@ def list_rules_in_chain(chain):
     return [rule for rule in chain.rules]
 
 
-def reset_aid_chain():
-    if table.is_chain('aid'):
-        iptc.Chain(table, 'aid').flush()
+def reset_aid_chain(chain_name='aid'):
+    if table.is_chain(chain_name):
+        iptc.Chain(table, chain_name).flush()
     else:
-        table.create_chain('aid')
+        table.create_chain(chain_name)
 
-def build_aid_chain():
+
+def build_aid_chain(chain_name='aid'):
     reset_aid_chain()
-    bad_ips = aid.get_aidlist_ips()
-    chain = iptc.Chain(table, 'aid')
+    bad_ips = aid.get_aidlist_ips()[:20]
+    chain = iptc.Chain(table, chain_name)
     for ip in bad_ips:
         rule = iptc.Rule()
         rule.src = str(ip)
         rule.target = iptc.Target(rule, "DROP")
         chain.append_rule(rule)
+
 
 
 
