@@ -5,12 +5,10 @@ table = iptc.Table(iptc.Table.FILTER)
 
 
 def list_filter_chains():
-    table = iptc.Table(iptc.Table.FILTER)
     return [chain.name for chain in table.chains]
 
 
 def list_rules_in_chain(chain):
-    table = iptc.Table(iptc.Table.FILTER)
     chain = iptc.Chain(table, chain)
     return [rule for rule in chain.rules]
 
@@ -33,10 +31,16 @@ def build_aid_chain(chain_name='aid'):
         chain.append_rule(rule)
 
 
+def remove_aid_chain_from_input(chain_name='aid'):
+    rules = list_rules_in_chain('INPUT')
+    for rule in rules:
+        if rule.target.name == chain_name:
+            iptc.Chain(table, 'INPUT').delete_rule(rule)
+
+
 def add_aid_chain_to_input(chain_name='aid', position=0):
     jump_to_aid = iptc.Rule()
     jump_to_aid.create_target(chain_name)
-
     input_chain = iptc.Chain(table, 'INPUT')
     input_chain.insert_rule(jump_to_aid, position)
 
@@ -45,4 +49,3 @@ def generate_aid_list(chain_name='aid', input_chain_position=0):
     build_aid_chain(chain_name)
     add_aid_chain_to_input(chain_name, input_chain_position)
 
-generate_aid_list()
