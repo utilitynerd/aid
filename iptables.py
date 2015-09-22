@@ -1,5 +1,7 @@
 import aid
 import iptc
+import ipaddress
+import sys
 
 table = iptc.Table(iptc.Table.FILTER)
 
@@ -20,15 +22,20 @@ def reset_aid_chain(chain_name='aid'):
         table.create_chain(chain_name)
 
 
-def build_aid_chain(chain_name='aid', services=None, start_date='1 week'):
+def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitelist=None):
+    if whitelist:
+        whitelisted_nets = load_whitelist(whitelist)
+    else:
+        whitelisted_nets = []
     reset_aid_chain()
     bad_ips = aid.get_aidlist_ips(services=services, start_date=start_date)[:20]
     chain = iptc.Chain(table, chain_name)
     for ip in bad_ips:
-        rule = iptc.Rule()
-        rule.src = str(ip)
-        rule.target = iptc.Target(rule, "DROP")
-        chain.append_rule(rule)
+        if not any(((ip in whitelist_net) for whitelist_net in whitelisted_nets)):
+            rule = iptc.Rule()
+            rule.src = str(ip)
+            rule.target = iptc.Target(rule, "DROP")
+            chain.append_rule(rule)
 
 
 def remove_aid_chain_from_input(chain_name='aid'):
@@ -46,7 +53,20 @@ def add_aid_chain_to_input(chain_name='aid', position=0):
     input_chain.insert_rule(jump_to_aid, position)
 
 
-def generate_aid_list(chain_name='aid', input_chain_position=0, services=None, start_date='1 week'):
-    build_aid_chain(chain_name=chain_name, services=services, start_date=start_date)
+def load_whitelist(path):
+    try:
+        with open(path) as whitelist:
+            try:
+                return [ipaddress.ip_network(ip.strip()) for ip in whitelist]
+            except ValueError as err:
+                sys.exit("Error processing whitelist - {}".format(err))
+    except FileNotFoundError:
+            sys.exit('whitelist file: "{}"  was not found'.format(path))
+
+
+def generate_aid_list(services=None, start_date='1 week', whitelist=None, chain_name='aid', input_chain_position=0,):
+    build_aid_chain(chain_name=chain_name, services=services, start_date=start_date, whitelist=whitelist)
     add_aid_chain_to_input(chain_name, input_chain_position)
+
+
 
