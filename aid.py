@@ -15,6 +15,7 @@ CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".sock.json")
 def call_sock_api(config, endpoint, **params):
     params["token"] = config.token
     url = "{host}/api/{endpoint}".format(host=config.host, endpoint=endpoint)
+    print(params)
     r = requests.get(url, params=params)
     return json.loads(r.text)
 
@@ -27,7 +28,7 @@ def load_config(path=CONFIG_PATH):
 
 # setting services=[] in function definition can cause strange problems.
 #  See: http://docs.python-guide.org/en/latest/writing/gotchas/
-def get_aidlist(services=None, start_date="1 week ago", config=None):
+def get_aidlist(services=None, start_date="1 week ago", seen_count=10, config=None):
     if not services:
         services = []
     if not config:
@@ -37,7 +38,7 @@ def get_aidlist(services=None, start_date="1 week ago", config=None):
         sys.exit("{} - invalid start date".format(start_date))
 
     aid_list = call_sock_api(config, 'aggressive_ips', service=",".join(services),
-                             last_seen_ts=last_seen_ts.isoformat())['aggressive_ips']
+                             last_seen_ts=last_seen_ts.isoformat(), seen_count=seen_count)['aggressive_ips']
     return [AIDEntry(ip=ipaddress.ip_address(entry['ip']),
                      tags=entry['tags'],
                      dst_port=entry['dst_port'],
@@ -46,7 +47,7 @@ def get_aidlist(services=None, start_date="1 week ago", config=None):
                      service=entry['service']) for entry in aid_list]
 
 
-def get_aidlist_ips(services=None, start_date="1 week ago", config=None):
-    aid_list = get_aidlist(services, start_date, config)
+def get_aidlist_ips(services=None, start_date="1 week ago", seen_count=10, config=None):
+    aid_list = get_aidlist(services, start_date, seen_count, config)
     return sorted([ipaddress.ip_address(entry.ip) for entry  in aid_list])
 
