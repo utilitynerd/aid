@@ -28,7 +28,7 @@ def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitel
         whitelisted_nets = load_whitelist(whitelist)
     else:
         whitelisted_nets = []
-    reset_aid_chain()
+    reset_aid_chain(chain_name)
     bad_ips = aid.get_aidlist_ips(services=services, start_date=start_date, seen_count=seen_count)[:20]
     chain = iptc.Chain(table, chain_name)
     for ip in bad_ips:
@@ -70,7 +70,8 @@ def load_whitelist(path):
 @click.option('--service', '-s', 'services', multiple=True, help="Only include hits for the specified service")
 @click.option('--whitelist', '-w', type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, resolve_path=True),
               help="Path to whitelist file containing one ip address or subnet per line")
-@click.option('--seencount', '-c', 'seen_count', type=click.INT, help="Minimum # of alerts an aid list IP has generated")
+@click.option('--seencount', '-c', 'seen_count', default=10, type=click.INT, help="Minimum # of alerts an aid list IP has generated")
+@click.option('--chain-name', '-n', 'chain_name', default='aid', help="The name of the iptables chain to use for the aid list")
 def generate_aid_list(services=None, start_date='1 week', whitelist=None, chain_name='aid', input_chain_position=0, seen_count=10):
     build_aid_chain(chain_name=chain_name, services=services, start_date=start_date, whitelist=whitelist, seen_count=seen_count)
     add_aid_chain_to_input(chain_name, input_chain_position)
