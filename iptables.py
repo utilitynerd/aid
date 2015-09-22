@@ -20,9 +20,9 @@ def reset_aid_chain(chain_name='aid'):
         table.create_chain(chain_name)
 
 
-def build_aid_chain(chain_name='aid'):
+def build_aid_chain(chain_name='aid', services=None, start_date='1 week'):
     reset_aid_chain()
-    bad_ips = aid.get_aidlist_ips()[:20]
+    bad_ips = aid.get_aidlist_ips(services=services, start_date=start_date)[:20]
     chain = iptc.Chain(table, chain_name)
     for ip in bad_ips:
         rule = iptc.Rule()
@@ -39,13 +39,14 @@ def remove_aid_chain_from_input(chain_name='aid'):
 
 
 def add_aid_chain_to_input(chain_name='aid', position=0):
+    remove_aid_chain_from_input()
     jump_to_aid = iptc.Rule()
     jump_to_aid.create_target(chain_name)
     input_chain = iptc.Chain(table, 'INPUT')
     input_chain.insert_rule(jump_to_aid, position)
 
 
-def generate_aid_list(chain_name='aid', input_chain_position=0):
-    build_aid_chain(chain_name)
+def generate_aid_list(chain_name='aid', input_chain_position=0, services=None, start_date='1 week'):
+    build_aid_chain(chain_name=chain_name, services=services, start_date=start_date)
     add_aid_chain_to_input(chain_name, input_chain_position)
 
