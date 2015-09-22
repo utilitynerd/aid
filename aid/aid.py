@@ -15,7 +15,6 @@ CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".sock.json")
 def call_sock_api(config, endpoint, **params):
     params["token"] = config.token
     url = "{host}/api/{endpoint}".format(host=config.host, endpoint=endpoint)
-    print(params)
     r = requests.get(url, params=params)
     return json.loads(r.text)
 
