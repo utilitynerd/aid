@@ -29,7 +29,7 @@ def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitel
     else:
         whitelisted_nets = []
     reset_aid_chain(chain_name)
-    bad_ips = aid.get_aidlist_ips(services=services, start_date=start_date, seen_count=seen_count)[:20]
+    bad_ips = aid.get_aidlist_ips(services=services, start_date=start_date, seen_count=seen_count)
     chain = iptc.Chain(table, chain_name)
     for ip in bad_ips:
         if not any(((ip in whitelist_net) for whitelist_net in whitelisted_nets)):
