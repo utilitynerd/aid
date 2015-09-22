@@ -37,7 +37,7 @@ def get_aidlist(services=None, start_date="1 week ago", config=None):
         sys.exit("{} - invalid start date".format(start_date))
 
     aid_list = call_sock_api(config, 'aggressive_ips', service=",".join(services),
-                             last_seen_ts=last_seen_ts)['aggressive_ips']
+                             last_seen_ts=last_seen_ts.isoformat())['aggressive_ips']
     return [AIDEntry(ip=ipaddress.ip_address(entry['ip']),
                      tags=entry['tags'],
                      dst_port=entry['dst_port'],
