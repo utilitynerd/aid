@@ -2,6 +2,7 @@ import aid
 import iptc
 import ipaddress
 import sys
+import click
 
 table = iptc.Table(iptc.Table.FILTER)
 
@@ -22,13 +23,13 @@ def reset_aid_chain(chain_name='aid'):
         table.create_chain(chain_name)
 
 
-def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitelist=None):
+def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitelist=None, seen_count=10):
     if whitelist:
         whitelisted_nets = load_whitelist(whitelist)
     else:
         whitelisted_nets = []
     reset_aid_chain()
-    bad_ips = aid.get_aidlist_ips(services=services, start_date=start_date)[:20]
+    bad_ips = aid.get_aidlist_ips(services=services, start_date=start_date, seen_count=seen_count)[:20]
     chain = iptc.Chain(table, chain_name)
     for ip in bad_ips:
         if not any(((ip in whitelist_net) for whitelist_net in whitelisted_nets)):
@@ -64,9 +65,18 @@ def load_whitelist(path):
             sys.exit('whitelist file: "{}"  was not found'.format(path))
 
 
-def generate_aid_list(services=None, start_date='1 week', whitelist=None, chain_name='aid', input_chain_position=0,):
-    build_aid_chain(chain_name=chain_name, services=services, start_date=start_date, whitelist=whitelist)
+@click.command()
+@click.option('--start-date', '-d', default='1 week', help="Generate AID list with IPs detected since start-date")
+@click.option('--service', '-s', 'services', multiple=True, help="Only include hits for the specified service")
+@click.option('--whitelist', '-w', type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, resolve_path=True),
+              help="Path to whitelist file containing one ip address or subnet per line")
+@click.option('--seencount', '-c', 'seen_count', type=click.INT, help="Minimum # of alerts an aid list IP has generated")
+def generate_aid_list(services=None, start_date='1 week', whitelist=None, chain_name='aid', input_chain_position=0, seen_count=10):
+    build_aid_chain(chain_name=chain_name, services=services, start_date=start_date, whitelist=whitelist, seen_count=seen_count)
     add_aid_chain_to_input(chain_name, input_chain_position)
 
+
+if __name__ == '__main__':
+    generate_aid_list()
 
 
