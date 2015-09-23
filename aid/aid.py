@@ -15,7 +15,8 @@ CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".sock.json")
 def call_sock_api(config, endpoint, **params):
     params["token"] = config.token
     url = "{host}/api/{endpoint}".format(host=config.host, endpoint=endpoint)
-    r = requests.get(url, params=params)
+    r = requests.get(url, timeout=config.timeout, params=params)
+    r.raise_for_status()
     return json.loads(r.text)
 
 
@@ -36,8 +37,14 @@ def get_aidlist(services=None, start_date="1 week ago", seen_count=10, config=No
     if not last_seen_ts:
         sys.exit("{} - invalid start date".format(start_date))
 
-    aid_list = call_sock_api(config, 'aggressive_ips', service=",".join(services),
-                             last_seen_ts=last_seen_ts.isoformat(), seen_count=seen_count)['aggressive_ips']
+    try:
+        aid_list = call_sock_api(config, 'aggressive_ips', service=",".join(services),
+                                 last_seen_ts=last_seen_ts.isoformat(), seen_count=seen_count)['aggressive_ips']
+    except requests.HTTPError as e:
+        sys.exit("HTTP ERROR: {}".format(e))
+    except requests.exceptions.ConnectTimeout as e:
+        sys.exit("HTTP Timeout: {}".format(e))
+
     return [AIDEntry(ip=ipaddress.ip_address(entry['ip']),
                      tags=entry['tags'],
                      dst_port=entry['dst_port'],

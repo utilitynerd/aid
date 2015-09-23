@@ -69,8 +69,10 @@ def load_whitelist(path):
 @click.option('--service', '-s', 'services', multiple=True, help="Only include hits for the specified service")
 @click.option('--whitelist', '-w', type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, resolve_path=True),
               help="Path to whitelist file containing one ip address or subnet per line")
-@click.option('--seencount', '-c', 'seen_count', default=10, type=click.INT, help="Minimum # of alerts an aid list IP has generated")
-@click.option('--chain-name', '-n', 'chain_name', default='aid', help="The name of the iptables chain to use for the aid list")
+@click.option('--seencount', '-c', 'seen_count', default=10, type=click.INT,
+              help="Minimum # of alerts an aid list IP has generated")
+@click.option('--chain-name', '-n', 'chain_name', default='aid',
+              help="The name of the iptables chain to use for the aid list")
 @click.option('--input-chain-pos', '-i', 'input_chain_position', default=0, type=click.INT,
               help="Position in INPUT chain to add a jump to the aid chain")
 def generate_aid_list(services=None, start_date='1 week', whitelist=None, chain_name='aid', input_chain_position=0, seen_count=10):
