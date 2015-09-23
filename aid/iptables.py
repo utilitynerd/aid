@@ -7,10 +7,6 @@ import click
 table = iptc.Table(iptc.Table.FILTER)
 
 
-def list_filter_chains():
-    return [chain.name for chain in table.chains]
-
-
 def list_rules_in_chain(chain):
     chain = iptc.Chain(table, chain)
     return [rule for rule in chain.rules]
