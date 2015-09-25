@@ -7,7 +7,8 @@ import dateparser
 import ipaddress
 
 SockConfig = collections.namedtuple("SockConfig", ['host', 'timeout', 'token'])
-AIDEntry = collections.namedtuple("AidEntry", ["ip", "tags", "dst_port", "last_seen_ts", "first_seen_ts", "service"])
+AIDEntry = collections.namedtuple("AidEntry", ["ip", "tags", "dst_port", "last_seen_ts",
+                                               "first_seen_ts", "service", "seen_count"])
 
 CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".sock.json")
 
@@ -50,7 +51,9 @@ def get_aidlist(services=None, start_date="1 week ago", seen_count=10, config=No
                      dst_port=entry['dst_port'],
                      last_seen_ts=entry['last_seen_ts'],
                      first_seen_ts=entry['first_seen_ts'],
-                     service=entry['service']) for entry in aid_list]
+                     service=entry['service'],
+                     seen_count=entry["seen_count"])
+            for entry in aid_list]
 
 
 def get_aidlist_ips(services=None, start_date="1 week ago", seen_count=10, config=None):
