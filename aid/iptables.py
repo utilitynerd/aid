@@ -3,6 +3,7 @@ import iptc
 import ipaddress
 import sys
 import click
+import requests
 
 table = iptc.Table(iptc.Table.FILTER)
 
@@ -26,7 +27,13 @@ def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitel
         whitelisted_nets = []
     # Try and fetch the aid list first.  This way if there is an error, the
     # current firewall rules remain in place
-    bad_ips = aid.get_aidlist_ips(services=services, start_date=start_date, seen_count=seen_count)
+    try:
+        bad_ips = aid.get_aidlist_ips(services=services, start_date=start_date, seen_count=seen_count)
+    except requests.HTTPError as e:
+        sys.exit("HTTP ERROR: {}".format(e))
+    except requests.exceptions.ConnectTimeout as e:
+        sys.exit("HTTP Timeout: {}".format(e))
+
     reset_aid_chain(chain_name)
 
     chain = iptc.Chain(table, chain_name)
