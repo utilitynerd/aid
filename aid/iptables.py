@@ -69,7 +69,7 @@ def load_whitelist(path):
 @click.option('--service', '-s', 'services', multiple=True, help="Only include hits for the specified service")
 @click.option('--whitelist', '-w', type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, resolve_path=True),
               help="Path to whitelist file containing one ip address or subnet per line")
-@click.option('--seencount', '-c', 'seen_count', default=10, type=click.INT,
+@click.option('--seen-count', '-c', 'seen_count', default=10, type=click.INT,
               help="Minimum # of alerts an aid list IP has generated")
 @click.option('--chain-name', '-n', 'chain_name', default='aid',
               help="The name of the iptables chain to use for the aid list")
