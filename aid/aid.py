@@ -38,13 +38,8 @@ def get_aidlist(services=None, start_date="1 week ago", seen_count=10, config=No
     if not last_seen_ts:
         sys.exit("{} - invalid start date".format(start_date))
 
-    try:
-        aid_list = call_sock_api(config, 'aggressive_ips', service=",".join(services),
-                                 last_seen_ts=last_seen_ts.isoformat(), seen_count=seen_count)['aggressive_ips']
-    except requests.HTTPError as e:
-        sys.exit("HTTP ERROR: {}".format(e))
-    except requests.exceptions.ConnectTimeout as e:
-        sys.exit("HTTP Timeout: {}".format(e))
+    aid_list = call_sock_api(config, 'aggressive_ips', service=",".join(services),
+                             last_seen_ts=last_seen_ts.isoformat(), seen_count=seen_count)['aggressive_ips']
 
     return [AIDEntry(ip=ipaddress.ip_address(entry['ip']),
                      tags=entry['tags'],
@@ -58,5 +53,5 @@ def get_aidlist(services=None, start_date="1 week ago", seen_count=10, config=No
 
 def get_aidlist_ips(services=None, start_date="1 week ago", seen_count=10, config=None):
     aid_list = get_aidlist(services, start_date, seen_count, config)
-    return sorted([ipaddress.ip_address(entry.ip) for entry  in aid_list])
+    return sorted({ipaddress.ip_address(entry.ip) for entry  in aid_list})
 
