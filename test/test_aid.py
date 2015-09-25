@@ -1,27 +1,15 @@
+from aid.iptables import  *
 from aid.aid import *
 import pytest
 import requests
-
-c = load_config()
-bad_host_config = SockConfig('https://sock.security.berkeley.edu/fail', 10, 'xxx')
-timeout_config = SockConfig('https://hudson.security.berkeley.edu', 0.0001, c.token)
+import collections
 
 
-def test_call_sock_bad_host():
-    with pytest.raises(requests.HTTPError):
-        call_sock_api(bad_host_config, 'api')
+def test_no_duplicate_ips():
+    c = collections.Counter(get_aidlist_ips())
+    assert set(c.values()) == {1}
 
-
-def test_get_aidlist_bad_host():
-    with pytest.raises(SystemExit):
-        get_aidlist_ips(config=bad_host_config)
-
-
-def test_call_sock_timeout():
-    with pytest.raises(requests.exceptions.ConnectTimeout):
-        call_sock_api(timeout_config, 'aggressive_ips')
-
-
-def test_get_aidlist_timeout():
-    with pytest.raises(SystemExit):
-        get_aidlist_ips(config=timeout_config)
+def test_AidEntry_captures_all_attributes():
+    config = load_config()
+    entry = call_sock_api(config, 'aggressive_ips')['aggressive_ips'][0]
+    assert set(entry.keys()) == set(AIDEntry._fields)
