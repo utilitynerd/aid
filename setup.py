@@ -12,14 +12,15 @@ setup(
     include_package_data=True,
     packages=find_packages(),
     install_requires=[
-        'Click',
         'requests',
         'dateparser',
-        'python-iptables'
     ],
-
-    entry_points='''
-     [console_scripts]
-     aid-iptables=aid.iptables:generate_aid_list
-     '''
+    extras_require={
+        'iptables': ["Click", "python-iptables"]
+    },
+    entry_points={
+        "console_scripts" : [
+            'aid-iptables=aid.iptables:generate_aid_list [iptables]'
+        ],
+    }
 )
