@@ -1,11 +1,19 @@
 import aid
-import iptc
+
 import ipaddress
 import sys
-import click
 import requests
 
-table = iptc.Table(iptc.Table.FILTER)
+try:
+    import iptc
+    import click
+except ImportError as e:
+    sys.exit("{} requires the {} module.".format(__file__, e.name))
+
+try:
+    table = iptc.Table(iptc.Table.FILTER)
+except iptc.ip4tc.IPTCError as e:
+    sys.exit(e)
 
 
 def list_rules_in_chain(chain):
