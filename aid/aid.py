@@ -30,10 +30,14 @@ def load_config(path=CONFIG_PATH):
 # setting services=[] in function definition can cause strange problems.
 #  See: http://docs.python-guide.org/en/latest/writing/gotchas/
 def get_aidlist(services=None, start_date="1 week ago", seen_count=10, config=None):
-    if not services:
+    if services is not None:
+        services = list(services)
+    else:
         services = []
+
     if not config:
         config = load_config()
+        
     last_seen_ts = dateparser.parse(start_date)
     if not last_seen_ts:
         sys.exit("{} - invalid start date".format(start_date))
