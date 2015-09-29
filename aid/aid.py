@@ -6,17 +6,17 @@ import collections
 import dateparser
 import ipaddress
 
-SockConfig = collections.namedtuple("SockConfig", ['host', 'timeout', 'token'])
+SockConfig = collections.namedtuple("SockConfig", ['host', 'token'])
 AIDEntry = collections.namedtuple("AidEntry", ["ip", "tags", "dst_port", "last_seen_ts",
                                                "first_seen_ts", "service", "seen_count"])
 
-CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".sock.json")
+CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".aid.json")
 
 
 def call_sock_api(config, endpoint, **params):
     params["token"] = config.token
     url = "{host}/api/{endpoint}".format(host=config.host, endpoint=endpoint)
-    r = requests.get(url, timeout=config.timeout, params=params)
+    r = requests.get(url, timeout=5, params=params)
     r.raise_for_status()
     return json.loads(r.text)
 
@@ -24,7 +24,7 @@ def call_sock_api(config, endpoint, **params):
 def load_config(path=CONFIG_PATH):
         with open(path) as fd:
             conf = json.load(fd)
-            return SockConfig(host=conf['host'], timeout=conf['timeout'], token=conf['token'])
+            return SockConfig(host=conf['host'],  token=conf['token'])
 
 
 # setting services=[] in function definition can cause strange problems.
@@ -37,7 +37,7 @@ def get_aidlist(services=None, start_date="1 week ago", seen_count=10, config=No
 
     if not config:
         config = load_config()
-        
+
     last_seen_ts = dateparser.parse(start_date)
     if not last_seen_ts:
         sys.exit("{} - invalid start date".format(start_date))
