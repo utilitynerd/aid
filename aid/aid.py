@@ -22,14 +22,14 @@ def call_sock_api(config, endpoint, **params):
 
 
 def load_config(path=CONFIG_PATH):
-        with open(path) as fd:
-            conf = json.load(fd)
-            return SockConfig(host=conf['host'],  token=conf['token'])
+    with open(path) as fd:
+        conf = json.load(fd)
+        return SockConfig(host=conf['host'], token=conf['token'])
 
 
 # setting services=[] in function definition can cause strange problems.
 #  See: http://docs.python-guide.org/en/latest/writing/gotchas/
-def get_aidlist(services=None, start_date="1 week ago", seen_count=10, config=None):
+def entries(services=None, start_date="1 week ago", seen_count=10, config=None):
     if services is not None:
         services = list(services)
     else:
@@ -55,7 +55,6 @@ def get_aidlist(services=None, start_date="1 week ago", seen_count=10, config=No
             for entry in aid_list]
 
 
-def get_aidlist_ips(services=None, start_date="1 week ago", seen_count=10, config=None):
-    aid_list = get_aidlist(services, start_date, seen_count, config)
-    return sorted({ipaddress.ip_address(entry.ip) for entry  in aid_list})
-
+def ips(services=None, start_date="1 week ago", seen_count=10, config=None):
+    aid_list = entries(services, start_date, seen_count, config)
+    return sorted({ipaddress.ip_address(entry.ip) for entry in aid_list})
