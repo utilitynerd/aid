@@ -4,14 +4,18 @@ import iptc
 
 test_ips = [ipaddress.ip_network(ip) for ip in ['192.0.2.2', '198.51.100.50', '203.0.113.0/24']]
 
-@pytest.fixture()
 def reset_iptables():
     iptc.Chain(table, 'INPUT').set_policy(iptc.Policy.ACCEPT)
     for chain in table.chains:
         chain.flush()
 
 @pytest.fixture()
-def add_test_iptables_rules(reset_iptables):
+def setup_teardown(request):
+    reset_iptables()
+    request.addfinalizer(reset_iptables)
+
+@pytest.fixture()
+def add_test_iptables_rules(setup_teardown):
     input_chain = iptc.Chain(table, 'INPUT')
     for ip in test_ips:
         rule = iptc.Rule()
