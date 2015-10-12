@@ -7,11 +7,11 @@ test_ips = [ipaddress.ip_address(ip) for ip in ['192.0.2.2', '198.51.100.50', '2
 test_whitelist_nets = [ipaddress.ip_network(net) for net in ['192.0.2.2', '192.0.2.1', '203.0.113.0/24']]
 
 def reset_iptables():
-    iptc.Chain(table, 'INPUT').set_policy(iptc.Policy.ACCEPT)
-    for chain in table.chains:
-        chain.flush()
+    table = iptc.Table(iptc.Table.FILTER)
+    table.flush()
 
-@pytest.fixture()
+
+@pytest.fixture(scope="function")
 def setup_teardown(request):
     reset_iptables()
     request.addfinalizer(reset_iptables)
@@ -43,11 +43,23 @@ def test_list_rules_in_chain(add_test_iptables_rules):
     assert len(test_ips) == len(rules)
     assert all([ipaddress.ip_address(rule.src.split('/')[0]) in test_ips for rule in rules])
 
+@pytest.mark.parametrize("chain_name",[
+    ("aid"),
+    ("test")
+])
+def test_prepare_new_aid_chain(setup_teardown,  chain_name):
+    assert table.is_chain(chain_name) is False
+    if chain_name == 'aid':
+        prepare_aid_chain()
+    else:
+        prepare_aid_chain(chain_name)
+    assert table.is_chain(chain_name) == True
 
-def test_reset_aid_chain(add_test_iptables_rules):
-    assert len(test_ips) == len(list_rules_in_chain('INPUT'))
-    reset_aid_chain('INPUT')
-    assert len(list_rules_in_chain('INPUT')) == 0
+
+# def test_reset_existing_aid_chain(add_test_iptables_rules):
+#     assert len(test_ips) == len(list_rules_in_chain('INPUT'))
+#     reset_aid_chain('INPUT')
+#     assert len(list_rules_in_chain('INPUT')) == 0
 
 
 def test_load_whitelist(create_whitelist):
@@ -74,3 +86,20 @@ def test_remove_whitelisted_ips(create_whitelist):
     processed_list = remove_whitelisted_ips(test_ips, test_whitelist_nets)
     assert len(processed_list) == 1
     assert processed_list.pop() == ipaddress.ip_address('198.51.100.50',)
+
+
+
+
+
+
+# def test_add_aid_chain_to_input(setup_teardown):
+#     table.create_chain
+#     add_aid_chain_to_input()
+#     rules = list_rules_in_chain('INPUT')
+#     assert len(rules) == 1
+#     assert rules[0].target.name == 'aid'
+#     reset_iptables()
+#     add_aid_chain_to_input('test')
+#     assert rules[0].target.name == 'aid'
+
+reset_iptables()

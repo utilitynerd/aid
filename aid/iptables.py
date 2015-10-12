@@ -21,7 +21,12 @@ def list_rules_in_chain(chain):
     return [rule for rule in chain.rules]
 
 
-def reset_aid_chain(chain_name='aid'):
+def prepare_aid_chain(chain_name='aid'):
+    """
+    Creates / resets aid iptables chain
+
+    :param chain_name: name for aid iptables chain
+    """
     if table.is_chain(chain_name):
         iptc.Chain(table, chain_name).flush()
     else:
@@ -29,10 +34,6 @@ def reset_aid_chain(chain_name='aid'):
 
 
 def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitelist=None, seen_count=10):
-    if whitelist:
-        whitelisted_nets = load_whitelist(whitelist)
-    else:
-        whitelisted_nets = []
     # Try and fetch the aid list first.  This way if there is an error, the
     # current firewall rules remain in place
     try:
@@ -42,15 +43,17 @@ def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitel
     except requests.exceptions.ConnectTimeout as e:
         sys.exit("HTTP Timeout: {}".format(e))
 
-    reset_aid_chain(chain_name)
+    prepare_aid_chain(chain_name)
 
     chain = iptc.Chain(table, chain_name)
+
+    whitelisted_nets = load_whitelist(whitelist)
+    bad_ips = remove_whitelisted_ips(bad_ips, whitelisted_nets)
     for ip in bad_ips:
-        if not any(((ip in whitelist_net) for whitelist_net in whitelisted_nets)):
-            rule = iptc.Rule()
-            rule.src = str(ip)
-            rule.target = iptc.Target(rule, "DROP")
-            chain.append_rule(rule)
+        rule = iptc.Rule()
+        rule.src = str(ip)
+        rule.target = iptc.Target(rule, "DROP")
+        chain.append_rule(rule)
 
 
 def remove_aid_chain_from_input(chain_name='aid'):
