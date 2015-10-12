@@ -29,6 +29,9 @@ def add_test_iptables_rules(setup_teardown):
 
 @pytest.fixture()
 def create_whitelist(tmpdir):
+    """
+    Creates whitelist in tmp location and returns its file object
+    """
     whitelist= os.path.join(str(tmpdir), 'whitelist')
     with open(whitelist, 'w') as f:
         f.writelines("\n".join(str(net) for net in test_whitelist_nets))
@@ -52,6 +55,19 @@ def test_load_whitelist(create_whitelist):
     assert len(test_whitelist_nets) == len(whitelist)
     assert all(isinstance(ip, ipaddress.IPv4Network) for ip in whitelist)
     assert all([ip in test_whitelist_nets for ip in whitelist])
+
+
+def test_fail_to_load_nonexistant_whitelist():
+    with pytest.raises(SystemExit):
+        load_whitelist('/fail')
+
+
+def test_fail_when_whitelist_contains_invalid_entry(create_whitelist):
+    with open(create_whitelist, 'a') as f:
+            f.write('\n')
+            f.write('a.b.c.d')
+    with pytest.raises(SystemExit):
+        load_whitelist(create_whitelist)
 
 
 def test_remove_whitelisted_ips(create_whitelist):

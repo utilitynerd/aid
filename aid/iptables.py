@@ -72,16 +72,25 @@ def load_whitelist(path):
     try:
         with open(path) as whitelist:
             try:
-                return [ipaddress.ip_network(ip.strip()) for ip in whitelist]
+                whitelist = [ipaddress.ip_network(ip.strip()) for ip in whitelist]
             except ValueError as err:
                 sys.exit("Error processing whitelist - {}".format(err))
     except FileNotFoundError:
             sys.exit('whitelist file: "{}"  was not found'.format(path))
+    return whitelist
 
-def remove_whitelisted_ips(ips, whitelist):
+
+def remove_whitelisted_ips(ips, whitelisted_nets):
+    """
+    Filters out ips contained in whitelisted_nets
+
+    :param ips: iterable of ipaddress.IP4Adress objects
+    :param whitelist: iterable of ipaddress.IP4Network Objects
+    :return: list only containing ips that are not in any subnets contained in whitelisted_nets
+    """
     ips = list(ips)
     for idx, ip in enumerate(ips):
-        if any([ip in whitelist_net for whitelist_net in whitelist]):
+        if any([ip in whitelist_net for whitelist_net in whitelisted_nets]):
             del ips[idx]
     return ips
 
