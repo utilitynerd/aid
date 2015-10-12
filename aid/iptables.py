@@ -78,6 +78,12 @@ def load_whitelist(path):
     except FileNotFoundError:
             sys.exit('whitelist file: "{}"  was not found'.format(path))
 
+def remove_whitelisted_ips(ips, whitelist):
+    ips = list(ips)
+    for idx, ip in enumerate(ips):
+        if any([ip in whitelist_net for whitelist_net in whitelist]):
+            del ips[idx]
+    return ips
 
 @click.command()
 @click.option('--start-date', '-d', default='1 week', help="Generate AID list with IPs detected since start-date")
