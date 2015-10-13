@@ -43,6 +43,7 @@ def add_block_rules_to_chain(ips, chain_name='aid'):
         rule.target = iptc.Target(rule, "DROP")
         chain.append_rule(rule)
 
+
 def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitelist=None, seen_count=10):
     # Try and fetch the aid list first.  This way if there is an error, the
     # current firewall rules remain in place
@@ -67,8 +68,7 @@ def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitel
 
 
 def remove_aid_chain_from_input(chain_name='aid'):
-    rules = list_rules_in_chain('INPUT')
-    for rule in rules:
+    for rule in iptc.Chain(table, "INPUT").rules:
         if rule.target.name == chain_name:
             iptc.Chain(table, 'INPUT').delete_rule(rule)
 

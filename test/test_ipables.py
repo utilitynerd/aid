@@ -10,21 +10,13 @@ def reset_iptables():
     table = iptc.Table(iptc.Table.FILTER)
     table.flush()
 
+def list_rules_in_chain(chain_name):
+    return [rule for rule in iptc.Chain(table, chain_name).rules]
 
 @pytest.fixture(scope="function")
 def setup_teardown(request):
     reset_iptables()
     request.addfinalizer(reset_iptables)
-
-
-@pytest.fixture()
-def add_test_iptables_rules(setup_teardown):
-    input_chain = iptc.Chain(table, 'INPUT')
-    for ip in test_ips:
-        rule = iptc.Rule()
-        rule.src = str(ip)
-        rule.target = iptc.Target(rule,'DROP')
-        input_chain.append_rule(rule)
 
 
 @pytest.fixture()
@@ -38,12 +30,6 @@ def create_whitelist(tmpdir):
     return whitelist
 
 
-def test_list_rules_in_chain(add_test_iptables_rules):
-    rules = list_rules_in_chain('INPUT')
-    assert len(test_ips) == len(rules)
-    assert all([ipaddress.ip_address(rule.src.split('/')[0]) in test_ips for rule in rules])
-
-
 def test_prepare_new_aid_chain(setup_teardown):
     assert table.is_chain('aid') is False
     prepare_aid_chain('aid')
@@ -51,13 +37,11 @@ def test_prepare_new_aid_chain(setup_teardown):
 
 
 def test_add_block_rules_to_chain(setup_teardown):
-    chain_name = 'INPUT'
-    chain = iptc.Chain(table, chain_name)
+    chain = prepare_aid_chain('aid')
     assert len(chain.rules) == 0
-    add_block_rules_to_chain(test_ips, 'INPUT')
+    add_block_rules_to_chain(test_ips, 'aid')
     assert len(chain.rules) == 3
     assert [rule.src.split('/')[0] for rule in chain.rules] == [str(ip) for ip in test_ips]
-
 
 
 def test_reset_existing_aid_chain(setup_teardown):
@@ -71,10 +55,40 @@ def test_reset_existing_aid_chain(setup_teardown):
     assert len(chain.rules) == 0
 
 
+def test_add_aid_chain_to_input(setup_teardown):
+    chain_name = 'aid'
+    prepare_aid_chain(chain_name)
+    add_aid_chain_to_input(chain_name=chain_name, position=0)
+    rules = list_rules_in_chain('INPUT')
+    assert len(rules) == 1
+    assert rules[0].target.name == 'aid'
+
+
+def test_add_aid_chain_to_middle_of_input(setup_teardown):
+    chain_name = 'aid'
+    prepare_aid_chain(chain_name)
+    add_block_rules_to_chain(test_ips, 'INPUT')
+    assert len(list_rules_in_chain('INPUT')) == 3
+    add_aid_chain_to_input(chain_name, 2)
+    assert list_rules_in_chain('INPUT')[2].target.name == chain_name
+
+
+def test_remove_aid_chain_from_input(setup_teardown):
+    chain_name = 'aid'
+    prepare_aid_chain(chain_name)
+    add_block_rules_to_chain(test_ips, 'INPUT')
+    add_aid_chain_to_input(chain_name=chain_name, position=1)
+    assert list_rules_in_chain('INPUT')[1].target.name == chain_name
+    remove_aid_chain_from_input(chain_name)
+    assert len(list_rules_in_chain('INPUT')) == 3
+    assert not any([rule.target.name == chain_name
+                   for rule in list_rules_in_chain('INPUT')])
+
+
 def test_load_whitelist(create_whitelist):
     whitelist = load_whitelist(create_whitelist)
     assert len(test_whitelist_nets) == len(whitelist)
-    assert all(isinstance(ip, ipaddress.IPv4Network) for ip in whitelist)
+    assert all([isinstance(ip, ipaddress.IPv4Network) for ip in whitelist])
     assert all([ip in test_whitelist_nets for ip in whitelist])
 
 
@@ -101,14 +115,5 @@ def test_remove_whitelisted_ips(create_whitelist):
 
 
 
-# def test_add_aid_chain_to_input(setup_teardown):
-#     table.create_chain
-#     add_aid_chain_to_input()
-#     rules = list_rules_in_chain('INPUT')
-#     assert len(rules) == 1
-#     assert rules[0].target.name == 'aid'
-#     reset_iptables()
-#     add_aid_chain_to_input('test')
-#     assert rules[0].target.name == 'aid'
 
-reset_iptables()
+
