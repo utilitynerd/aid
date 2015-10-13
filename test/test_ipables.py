@@ -43,23 +43,32 @@ def test_list_rules_in_chain(add_test_iptables_rules):
     assert len(test_ips) == len(rules)
     assert all([ipaddress.ip_address(rule.src.split('/')[0]) in test_ips for rule in rules])
 
-@pytest.mark.parametrize("chain_name",[
-    ("aid"),
-    ("test")
-])
-def test_prepare_new_aid_chain(setup_teardown,  chain_name):
-    assert table.is_chain(chain_name) is False
-    if chain_name == 'aid':
-        prepare_aid_chain()
-    else:
-        prepare_aid_chain(chain_name)
-    assert table.is_chain(chain_name) == True
+
+def test_prepare_new_aid_chain(setup_teardown):
+    assert table.is_chain('aid') is False
+    prepare_aid_chain('aid')
+    assert table.is_chain('aid') == True
 
 
-# def test_reset_existing_aid_chain(add_test_iptables_rules):
-#     assert len(test_ips) == len(list_rules_in_chain('INPUT'))
-#     reset_aid_chain('INPUT')
-#     assert len(list_rules_in_chain('INPUT')) == 0
+def test_add_block_rules_to_chain(setup_teardown):
+    chain_name = 'INPUT'
+    chain = iptc.Chain(table, chain_name)
+    assert len(chain.rules) == 0
+    add_block_rules_to_chain(test_ips, 'INPUT')
+    assert len(chain.rules) == 3
+    assert [rule.src.split('/')[0] for rule in chain.rules] == [str(ip) for ip in test_ips]
+
+
+
+def test_reset_existing_aid_chain(setup_teardown):
+    assert not table.is_chain('aid')
+    chain = prepare_aid_chain('aid')
+    assert table.is_chain('aid')
+    assert len(chain.rules) == 0
+    add_block_rules_to_chain(test_ips)
+    assert len(chain.rules) == 3
+    chain = prepare_aid_chain('aid')
+    assert len(chain.rules) == 0
 
 
 def test_load_whitelist(create_whitelist):

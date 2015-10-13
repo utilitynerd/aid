@@ -26,12 +26,22 @@ def prepare_aid_chain(chain_name='aid'):
     Creates / resets aid iptables chain
 
     :param chain_name: name for aid iptables chain
+    :return : iptc.Chain object of prepared chain
     """
     if table.is_chain(chain_name):
         iptc.Chain(table, chain_name).flush()
     else:
         table.create_chain(chain_name)
+    return iptc.Chain(table, chain_name)
 
+
+def add_block_rules_to_chain(ips, chain_name='aid'):
+    chain = iptc.Chain(table, chain_name)
+    for ip in ips:
+        rule = iptc.Rule()
+        rule.src = str(ip)
+        rule.target = iptc.Target(rule, "DROP")
+        chain.append_rule(rule)
 
 def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitelist=None, seen_count=10):
     # Try and fetch the aid list first.  This way if there is an error, the
