@@ -3,7 +3,7 @@ import collections
 
 
 def test_no_duplicate_ips():
-    c = collections.Counter(get_aidlist_ips())
+    c = collections.Counter(ips())
     assert set(c.values()) == {1}
 
 
@@ -13,3 +13,4 @@ def test_aidentry_captures_all_attributes():
     entry = call_sock_api(config, 'aggressive_ips')['aggressive_ips'][0]
     # compare the entries keys to the fields in AIDEntry
     assert set(entry.keys()) == set(AIDEntry._fields)
+

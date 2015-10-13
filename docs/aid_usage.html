@@ -222,7 +222,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="n">aid_list</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span class="n">aid_list</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">entries</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -290,9 +290,9 @@ div#notebook {
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>AidEntry(ip=IPv4Address(&apos;122.224.6.150&apos;), tags=[], dst_port=3306, last_seen_ts=&apos;2015-09-29T14:33:05.000-07:00&apos;, first_seen_ts=&apos;2015-05-17T16:20:23.000-07:00&apos;, service=&apos;mysql&apos;, seen_count=108)
+<pre>AidEntry(ip=IPv4Address(&apos;210.212.98.235&apos;), tags=[], dst_port=3306, last_seen_ts=&apos;2015-10-13T06:52:41.000-07:00&apos;, first_seen_ts=&apos;2015-05-12T15:46:33.000-07:00&apos;, service=&apos;mysql&apos;, seen_count=39)
 
-122.224.6.150 3306
+210.212.98.235 3306
 </pre>
 </div>
 </div>
@@ -316,14 +316,14 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="n">aid_list_ssh</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;ssh&#39;</span><span class="p">])</span>
-<span class="n">aid_list_rdp</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;rdp&#39;</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span class="n">aid_list_ssh</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">entries</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;ssh&#39;</span><span class="p">])</span>
+<span class="n">aid_list_rdp</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">entries</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;rdp&#39;</span><span class="p">])</span>
 
-<span class="n">aid_list_ssh_and_rdp</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;ssh&#39;</span><span class="p">,</span> <span class="s">&#39;rdp&#39;</span><span class="p">])</span>
+<span class="n">aid_list_ssh_and_rdp</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">entries</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;ssh&#39;</span><span class="p">,</span> <span class="s">&#39;rdp&#39;</span><span class="p">])</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">aid_list_ssh</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s">&quot;aid_list_ssh: {0} entries</span><span class="se">\n</span><span class="s">aid_list_rdp: {1} entries</span><span class="se">\n</span><span class="s">aid_list_ssh_and_rdp {2} entries&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+<span class="nb">print</span><span class="p">(</span><span class="s">&quot;aid_list_ssh: {} entries</span><span class="se">\n</span><span class="s">aid_list_rdp: {} entries</span><span class="se">\n</span><span class="s">aid_list_ssh_and_rdp {} entries&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">aid_list_ssh</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">aid_list_rdp</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">aid_list_ssh_and_rdp</span><span class="p">)))</span>
 </pre></div>
 
@@ -337,11 +337,11 @@ div#notebook {
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>AidEntry(ip=IPv4Address(&apos;58.218.211.166&apos;), tags=[], dst_port=22, last_seen_ts=&apos;2015-09-29T14:49:49.000-07:00&apos;, first_seen_ts=&apos;2015-04-24T13:46:51.000-07:00&apos;, service=&apos;ssh&apos;, seen_count=17836)
+<pre>AidEntry(ip=IPv4Address(&apos;222.186.190.55&apos;), tags=[], dst_port=22, last_seen_ts=&apos;2015-10-13T14:02:22.000-07:00&apos;, first_seen_ts=&apos;2015-09-07T19:35:27.000-07:00&apos;, service=&apos;ssh&apos;, seen_count=14)
 
-aid_list_ssh: 101 entries
-aid_list_rdp: 16 entries
-aid_list_ssh_and_rdp 117 entries
+aid_list_ssh: 94 entries
+aid_list_rdp: 14 entries
+aid_list_ssh_and_rdp 108 entries
 </pre>
 </div>
 </div>
@@ -362,12 +362,12 @@ aid_list_ssh_and_rdp 117 entries
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="n">aid_list_last_day</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="s">&#39;1 day&#39;</span><span class="p">)</span>
-<span class="n">aid_list_two_weeks</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="s">&#39;2 weeks&#39;</span><span class="p">)</span>
-<span class="n">aid_list_since_sept</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="s">&quot;2015-09-01&quot;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span class="n">aid_list_last_day</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">entries</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="s">&#39;1 day&#39;</span><span class="p">)</span>
+<span class="n">aid_list_two_weeks</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">entries</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="s">&#39;2 weeks&#39;</span><span class="p">)</span>
+<span class="n">aid_list_since_sept</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">entries</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="s">&quot;2015-09-01&quot;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;aid_list_last_day: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aid_list_last_day</span><span class="p">)))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;aid_list_two_weeks: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aid_list_two_weeks</span><span class="p">)))</span>
@@ -384,9 +384,9 @@ aid_list_ssh_and_rdp 117 entries
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>aid_list_last_day: 51
-aid_list_two_weeks: 241
-aid_list_since_sept: 369
+<pre>aid_list_last_day: 29
+aid_list_two_weeks: 200
+aid_list_since_sept: 453
 </pre>
 </div>
 </div>
@@ -407,11 +407,11 @@ aid_list_since_sept: 369
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="n">all_ips</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist</span><span class="p">()</span>
-<span class="n">more_aggro_ips</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist</span><span class="p">(</span><span class="n">seen_count</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span class="n">all_ips</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">entries</span><span class="p">()</span>
+<span class="n">more_aggro_ips</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">entries</span><span class="p">(</span><span class="n">seen_count</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;all_ips: {}</span><span class="se">\n</span><span class="s">aggro_ips: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_ips</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">more_aggro_ips</span><span class="p">)))</span>
 </pre></div>
@@ -426,8 +426,8 @@ aid_list_since_sept: 369
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>all_ips: 187
-aggro_ips: 86
+<pre>all_ips: 141
+aggro_ips: 68
 </pre>
 </div>
 </div>
@@ -448,10 +448,10 @@ aggro_ips: 86
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="n">combo_filter</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;ssh&#39;</span><span class="p">,</span> <span class="s">&#39;rdp&#39;</span><span class="p">],</span> <span class="n">start_date</span><span class="o">=</span><span class="s">&#39;1 month&#39;</span><span class="p">,</span> <span class="n">seen_count</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span class="n">combo_filter</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">entries</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;ssh&#39;</span><span class="p">,</span> <span class="s">&#39;rdp&#39;</span><span class="p">],</span> <span class="n">start_date</span><span class="o">=</span><span class="s">&#39;1 month&#39;</span><span class="p">,</span> <span class="n">seen_count</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;combo_filter: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combo_filter</span><span class="p">)))</span>
 </pre></div>
 
@@ -465,7 +465,7 @@ aggro_ips: 86
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>combo_filter: 155
+<pre>combo_filter: 144
 </pre>
 </div>
 </div>
@@ -479,20 +479,20 @@ aggro_ips: 86
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Getting-Unique-IP-Addresses">Getting Unique IP Addresses<a class="anchor-link" href="#Getting-Unique-IP-Addresses">&#182;</a></h3><p>If an IP generates alerts for multiple services (ssh and rdp for example) then that IP will have multiple entries in the aid list (one per service).  The aid modules also proves get_aidlist_ips which returns a list of unique IP addresses only.</p>
+<h3 id="Getting-Unique-IP-Addresses">Getting Unique IP Addresses<a class="anchor-link" href="#Getting-Unique-IP-Addresses">&#182;</a></h3><p>If an IP generates alerts for multiple services (ssh and rdp for example) then that IP will have multiple entries in the aid list (one per service).  The aid modules also proves ips() which returns a list of unique IP addresses only.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="n">all_ips</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist</span><span class="p">()</span>
-<span class="n">unique_ips</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">get_aidlist_ips</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span class="n">all_entries</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">entries</span><span class="p">()</span>
+<span class="n">unique_ips</span> <span class="o">=</span> <span class="n">aid</span><span class="o">.</span><span class="n">ips</span><span class="p">()</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s">&quot;all_ips: {}</span><span class="se">\n</span><span class="s">unique_ips: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_ips</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_ips</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s">&quot;all_ips: {}</span><span class="se">\n</span><span class="s">unique_ips: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_ips</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_entries</span><span class="p">)))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">ip</span> <span class="ow">in</span> <span class="n">unique_ips</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
@@ -508,15 +508,15 @@ aggro_ips: 86
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>all_ips: 187
-unique_ips: 162
+<pre>all_ips: 141
+unique_ips: 141
 
 
-5.45.79.24
+14.141.150.186
 23.95.82.74
-27.24.213.194
+23.234.29.139
+27.221.10.43
 36.72.228.72
-43.229.53.13
 </pre>
 </div>
 </div>
