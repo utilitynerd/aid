@@ -1,7 +1,8 @@
-import aid
-
 import ipaddress
 import sys
+
+import aid
+
 import requests
 
 try:
@@ -16,17 +17,12 @@ except iptc.ip4tc.IPTCError as e:
     sys.exit(e)
 
 
-def list_rules_in_chain(chain):
-    chain = iptc.Chain(table, chain)
-    return [rule for rule in chain.rules]
-
-
 def prepare_aid_chain(chain_name='aid'):
     """
-    Creates / resets aid iptables chain
+    Ensure an empty IPTables chain, named chain_name, exist
 
-    :param chain_name: name for aid iptables chain
-    :return : iptc.Chain object of prepared chain
+    :param chain_name: name of IPTables chain to create
+    :return: prepared iptc.Chain object
     """
     if table.is_chain(chain_name):
         iptc.Chain(table, chain_name).flush()
@@ -36,6 +32,13 @@ def prepare_aid_chain(chain_name='aid'):
 
 
 def add_block_rules_to_chain(ips, chain_name='aid'):
+    """
+    Add a DROP  rule to chain_name for each ip in ips
+
+    :param ips: iterable of ipaddress.IPV4Address objects
+    :param chain_name: name of IPTables chain to add block rules to
+    :return: None
+    """
     chain = iptc.Chain(table, chain_name)
     for ip in ips:
         rule = iptc.Rule()
@@ -44,36 +47,26 @@ def add_block_rules_to_chain(ips, chain_name='aid'):
         chain.append_rule(rule)
 
 
-def build_aid_chain(chain_name='aid', services=None, start_date='1 week', whitelist=None, seen_count=10):
-    # Try and fetch the aid list first.  This way if there is an error, the
-    # current firewall rules remain in place
-    try:
-        bad_ips = aid.ips(services=services, start_date=start_date, seen_count=seen_count)
-    except requests.HTTPError as e:
-        sys.exit("HTTP ERROR: {}".format(e))
-    except requests.exceptions.ConnectTimeout as e:
-        sys.exit("HTTP Timeout: {}".format(e))
-
-    prepare_aid_chain(chain_name)
-
-    chain = iptc.Chain(table, chain_name)
-
-    whitelisted_nets = load_whitelist(whitelist)
-    bad_ips = remove_whitelisted_ips(bad_ips, whitelisted_nets)
-    for ip in bad_ips:
-        rule = iptc.Rule()
-        rule.src = str(ip)
-        rule.target = iptc.Target(rule, "DROP")
-        chain.append_rule(rule)
-
-
 def remove_aid_chain_from_input(chain_name='aid'):
+    """
+    remove any rules in the INPUT chain targeting chain_namej
+
+    :param chain_name:  name of IPTables chain to remove rules that target it
+    :return: None
+    """
     for rule in iptc.Chain(table, "INPUT").rules:
         if rule.target.name == chain_name:
             iptc.Chain(table, 'INPUT').delete_rule(rule)
 
 
 def add_aid_chain_to_input(chain_name='aid', position=0):
+    """
+    Adds a rule to the INPUT chain, at position, targeting chain_name
+
+    :param chain_name: name of iptables chain that should be the target of the JUMP rule added to INPUT
+    :param position: numberical position in the INPUT table where jump rule should be added, equivilant to iptables -I INPUT position
+    :return: None
+    """
     remove_aid_chain_from_input()
     jump_to_aid = iptc.Rule()
     jump_to_aid.create_target(chain_name)
@@ -82,6 +75,12 @@ def add_aid_chain_to_input(chain_name='aid', position=0):
 
 
 def load_whitelist(path):
+    """
+    parse a file containing one subnet per line into a list of ipaddress.IPv4Network objects
+
+    :param path: path to whitelist file
+    :return: list of ipaddress.IPv4Network objectsj
+    """
     try:
         with open(path) as whitelist:
             try:
@@ -89,7 +88,7 @@ def load_whitelist(path):
             except ValueError as err:
                 sys.exit("Error processing whitelist - {}".format(err))
     except FileNotFoundError:
-            sys.exit('whitelist file: "{}"  was not found'.format(path))
+        sys.exit('whitelist file: "{}"  was not found'.format(path))
     return whitelist
 
 
@@ -107,23 +106,46 @@ def remove_whitelisted_ips(ips, whitelisted_nets):
             del ips[idx]
     return ips
 
+
+def fetch_aid_list(services=None, start_date='1 week', seen_count=10):
+    """
+    fetch the aid list
+
+    :param services:  list of service names.  if not None, only aid entries matching one the service names are returned
+    :param start_date: aid entries are only returned if they have been detected since start_date
+    :param seen_count: minimum number of detections required for an ip to be returned
+    :return: list of ipaddress.IPv4Address objects
+    """
+    try:
+        bad_ips = aid.ips(services=services, start_date=start_date, seen_count=seen_count)
+    except requests.HTTPError as e:
+        sys.exit("HTTP ERROR: {}".format(e))
+    except requests.exceptions.ConnectTimeout as e:
+        sys.exit("HTTP Timeout: {}".format(e))
+    return bad_ips
+
+
 @click.command()
-@click.option('--start-date', '-d', default='1 week', help="Generate AID list with IPs detected since start-date")
-@click.option('--service', '-s', 'services', multiple=True, help="Only include hits for the specified service")
-@click.option('--whitelist', '-w', type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, resolve_path=True),
+@click.option('--start-date', default='1 week', help="Generate AID list with IPs detected since start-date")
+@click.option('--service',  'services', multiple=True, help="Only include hits for the specified service")
+@click.option('--whitelist',
+              type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, resolve_path=True),
               help="Path to whitelist file containing one ip address or subnet per line")
-@click.option('--seen-count', '-c', 'seen_count', default=10, type=click.INT,
+@click.option('--seen-count', 'seen_count', default=10, type=click.INT,
               help="Minimum # of alerts an aid list IP has generated")
-@click.option('--chain-name', '-n', 'chain_name', default='aid',
+@click.option('--chain-name', 'chain_name', default='aid',
               help="The name of the iptables chain to use for the aid list")
-@click.option('--input-chain-pos', '-i', 'input_chain_position', default=0, type=click.INT,
+@click.option('--input-chain-pos', 'input_chain_position', default=0, type=click.INT,
               help="Position in INPUT chain to add a jump to the aid chain")
-def generate_aid_list(services=None, start_date='1 week', whitelist=None, chain_name='aid', input_chain_position=0, seen_count=10):
-    build_aid_chain(chain_name=chain_name, services=services, start_date=start_date, whitelist=whitelist, seen_count=seen_count)
+def generate_aid_list(services=None, start_date='1 week', seen_count=10, whitelist=None, chain_name='aid',
+                      input_chain_position=0):
+    # Try to fetch the aid list first, any error will stop the program leaving current
+    # IPTables rules in place
+    ips = fetch_aid_list(services=services, start_date=start_date, seen_count=seen_count)
+    prepare_aid_chain(chain_name)
+    if whitelist:
+        whitelisted_nets = load_whitelist(whitelist)
+        ips = remove_whitelisted_ips(ips, whitelisted_nets)
+    add_block_rules_to_chain(ips, chain_name)
     add_aid_chain_to_input(chain_name, input_chain_position)
-
-
-if __name__ == '__main__':
-    generate_aid_list()
-
 

@@ -110,10 +110,3 @@ def test_remove_whitelisted_ips(create_whitelist):
     assert len(processed_list) == 1
     assert processed_list.pop() == ipaddress.ip_address('198.51.100.50',)
 
-
-
-
-
-
-
-

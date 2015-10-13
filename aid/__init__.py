@@ -1,1 +1,1 @@
-from .aid import entries, ips, AIDEntry
+from aid.aid import entries, ips, AIDEntry
