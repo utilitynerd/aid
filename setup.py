@@ -3,7 +3,7 @@ from setuptools import  setup, find_packages
 
 setup(
     name='aid',
-    version='0.0.1.dev3',
+    version='0.0.1',
     url='',
     license='Copyright UC Regents',
     author='Mike Jones',
