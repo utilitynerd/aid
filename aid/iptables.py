@@ -17,6 +17,9 @@ except iptc.ip4tc.IPTCError as e:
     sys.exit(e)
 
 
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+
 def prepare_aid_chain(chain_name='aid'):
     """
     Ensure an empty IPTables chain, named chain_name, exist
@@ -125,7 +128,7 @@ def fetch_aid_list(services=None, start_date='1 week', seen_count=10):
     return bad_ips
 
 
-@click.command()
+@click.command(context_settings=CONTEXT_SETTINGS)
 @click.option('--start-date', default='1 week', help="Generate AID list with IPs detected since start-date")
 @click.option('--service',  'services', multiple=True, help="Only include hits for the specified service")
 @click.option('--whitelist',
