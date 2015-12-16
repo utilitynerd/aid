@@ -130,7 +130,7 @@ def fetch_aid_list(services=None, start_date='1 week', seen_count=10):
 
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.option('--start-date', default='1 week', help="default='1 week ago' - Generate AID list with IPs detected since start-date")
-@click.option('--service',  'services', multiple=True, help="default="" (all services) - Only include hits for the specified service")
+@click.option('--service',  'services', multiple=True, help="default="" (all services) - Only include hits for the specified service [mysql, rdp, ssh, vnc]")
 @click.option('--whitelist',
               type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, resolve_path=True),
               help="Path to whitelist file containing one ip address or subnet per line")

@@ -24,7 +24,7 @@ def __call_sock_api(config, endpoint, **params):
     """
     params["token"] = config.token
     url = "{host}/api/{endpoint}".format(host=config.host, endpoint=endpoint)
-    r = requests.get(url, timeout=5, params=params)
+    r = requests.get(url, timeout=20, params=params)
     r.raise_for_status()
     return json.loads(r.text)
 
@@ -38,7 +38,7 @@ def __load_config(path=CONFIG_PATH):
     """
     with open(path) as fd:
         conf = json.load(fd)
-        return SockConfig(host=conf['host'], token=conf['token'])
+        return SockConfig(host=conf['server'], token=conf['api_key'])
 
 
 def entries(services=None, start_date="1 week ago", seen_count=10, config=None):
