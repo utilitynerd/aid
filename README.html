@@ -1,0 +1,20 @@
+<h2>Installation</h2>
+<p>To just install the python aid library</p>
+<pre><code>pip install aid
+</code></pre>
+<p>To also install the aid-iptables script.  <strong>NOTE:</strong> the aid-iptables script requires (and will install as a dependency) the python-iptables library, which requires iptables.</p>
+<pre><code>pip install "aid[iptables]"
+</code></pre>
+<h2>Configuration</h2>
+<p>By default the aid module expects a configuration file in the user's home folder named '.aid.json'.  The configuration file is a single JSON dictionary containing two keys, "server" and "api_key".  </p>
+<h3>Example .aid.json configuration file</h3>
+<pre><code>{
+  "server": "https://aid.example.com",
+  "token": "234a9c9bd909f90df023810aced0bef0752a",
+}
+</code></pre>
+<p>See the individual documentation for the aid module or the aid-iptables script for infomation about changing the location and name of the configuration file.</p>
+<h2>Documentation</h2>
+<h3><a href="docs/aid.html">aid module api</a></h3>
+<h3><a href="docs/aid_usage.html">aid module usage</a></h3>
+<h3><a href="docs/aid-iptables.html">aid-iptables usage</a></h3>
