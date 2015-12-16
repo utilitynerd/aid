@@ -19,7 +19,7 @@ By default the aid module expects a configuration file in the user's home folder
 
     {
       "server": "https://aid.example.com",
-      "token": "234a9c9bd909f90df023810aced0bef0752a",
+      "api_key": "234a9c9bd909f90df023810aced0bef0752a"
     }
 
 See the individual documentation for the aid module or the aid-iptables script for infomation about changing the location and name of the configuration file.
