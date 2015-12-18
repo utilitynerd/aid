@@ -17,9 +17,6 @@ except iptc.ip4tc.IPTCError as e:
     sys.exit(e)
 
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-
-
 def prepare_aid_chain(chain_name='aid'):
     """
     Ensure an empty IPTables chain, named chain_name, exist
@@ -128,18 +125,6 @@ def fetch_aid_list(services=None, start_date='1 week', seen_count=10):
     return bad_ips
 
 
-@click.command(context_settings=CONTEXT_SETTINGS)
-@click.option('--start-date', default='1 week', help="default='1 week ago' - Generate AID list with IPs detected since start-date")
-@click.option('--service',  'services', multiple=True, help="default="" (all services) - Only include hits for the specified service [mysql, rdp, ssh, vnc]")
-@click.option('--whitelist',
-              type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, resolve_path=True),
-              help="Path to whitelist file containing one ip address or subnet per line")
-@click.option('--seen-count', 'seen_count', default=10, type=click.INT,
-              help="default=10 - Minimum # of alerts an aid list IP has generated")
-@click.option('--chain-name', 'chain_name', default='aid',
-              help="default=aid - The name of the iptables chain to use for the aid list")
-@click.option('--input-chain-pos', 'input_chain_position', default=0, type=click.INT,
-              help="default=0 - Position in INPUT chain to add a jump to the aid chain")
 def generate_aid_list(services=None, start_date='1 week', seen_count=10, whitelist=None, chain_name='aid',
                       input_chain_position=0):
     # Try to fetch the aid list first, any error will stop the program leaving current
@@ -151,4 +136,3 @@ def generate_aid_list(services=None, start_date='1 week', seen_count=10, whiteli
         ips = remove_whitelisted_ips(ips, whitelisted_nets)
     add_block_rules_to_chain(ips, chain_name)
     add_aid_chain_to_input(chain_name, input_chain_position)
-

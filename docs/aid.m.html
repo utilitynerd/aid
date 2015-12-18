@@ -1045,8 +1045,11 @@ table {
     <li class="set"><h3><a href="#header-functions">Functions</a></h3>
       
   <ul>
+    <li class="mono"><a href="#aid.aid.call_sock_api">call_sock_api</a></li>
     <li class="mono"><a href="#aid.aid.entries">entries</a></li>
     <li class="mono"><a href="#aid.aid.ips">ips</a></li>
+    <li class="mono"><a href="#aid.aid.load_config">load_config</a></li>
+    <li class="mono"><a href="#aid.aid.services">services</a></li>
   </ul>
 
     </li>
@@ -1083,10 +1086,11 @@ table {
     <div class="codehilite"><pre><span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">dateparser</span>
+
 <span class="kn">import</span> <span class="nn">ipaddress</span>
+<span class="kn">import</span> <span class="nn">dateparser</span>
+<span class="kn">import</span> <span class="nn">requests</span>
 
 <span class="n">SockConfig</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s">&quot;SockConfig&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;host&#39;</span><span class="p">,</span> <span class="s">&#39;token&#39;</span><span class="p">])</span>
 <span class="n">AIDEntry</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s">&quot;AidEntry&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;ip&quot;</span><span class="p">,</span> <span class="s">&quot;tags&quot;</span><span class="p">,</span> <span class="s">&quot;dst_port&quot;</span><span class="p">,</span> <span class="s">&quot;last_seen_ts&quot;</span><span class="p">,</span>
@@ -1104,9 +1108,12 @@ table {
 <span class="sd">    :param params: dict of additional parameters for api request</span>
 <span class="sd">    :return: api response as python object</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
+
     <span class="n">params</span><span class="p">[</span><span class="s">&quot;token&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">token</span>
     <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;{host}/api/{endpoint}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="n">endpoint</span><span class="p">)</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
     <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 
@@ -1120,7 +1127,7 @@ table {
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
         <span class="n">conf</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">SockConfig</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">conf</span><span class="p">[</span><span class="s">&#39;host&#39;</span><span class="p">],</span> <span class="n">token</span><span class="o">=</span><span class="n">conf</span><span class="p">[</span><span class="s">&#39;token&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">SockConfig</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">conf</span><span class="p">[</span><span class="s">&#39;server&#39;</span><span class="p">],</span> <span class="n">token</span><span class="o">=</span><span class="n">conf</span><span class="p">[</span><span class="s">&#39;api_key&#39;</span><span class="p">])</span>
 
 
 <span class="k">def</span> <span class="nf">entries</span><span class="p">(</span><span class="n">services</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="s">&quot;1 week ago&quot;</span><span class="p">,</span> <span class="n">seen_count</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -1138,15 +1145,12 @@ table {
     <span class="k">else</span><span class="p">:</span>
         <span class="n">services</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
-
     <span class="n">last_seen_ts</span> <span class="o">=</span> <span class="n">dateparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">start_date</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">last_seen_ts</span><span class="p">:</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s">&quot;{} - invalid start date&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_date</span><span class="p">))</span>
 
     <span class="n">aid_list</span> <span class="o">=</span> <span class="n">call_sock_api</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s">&#39;aggressive_ips&#39;</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">services</span><span class="p">),</span>
-                               <span class="n">last_seen_ts</span><span class="o">=</span><span class="n">last_seen_ts</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">seen_count</span><span class="o">=</span><span class="n">seen_count</span><span class="p">)[</span><span class="s">&#39;aggressive_ips&#39;</span><span class="p">]</span>
+                             <span class="n">last_seen_ts</span><span class="o">=</span><span class="n">last_seen_ts</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">seen_count</span><span class="o">=</span><span class="n">seen_count</span><span class="p">)[</span><span class="s">&#39;aggressive_ips&#39;</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="p">[</span><span class="n">AIDEntry</span><span class="p">(</span><span class="n">ip</span><span class="o">=</span><span class="n">ipaddress</span><span class="o">.</span><span class="n">ip_address</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s">&#39;ip&#39;</span><span class="p">]),</span>
                      <span class="n">tags</span><span class="o">=</span><span class="n">entry</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">],</span>
@@ -1170,6 +1174,18 @@ table {
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">aid_list</span> <span class="o">=</span> <span class="n">entries</span><span class="p">(</span><span class="n">services</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">seen_count</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">ipaddress</span><span class="o">.</span><span class="n">ip_address</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">ip</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">aid_list</span><span class="p">})</span>
+
+
+<span class="k">def</span> <span class="nf">services</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    returns the list of services currently monitored by aid</span>
+
+<span class="sd">    :param config:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">service_list</span> <span class="o">=</span> <span class="n">call_sock_api</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s">&#39;aggressive_ips/services&#39;</span><span class="p">)[</span><span class="s">&#39;services&#39;</span><span class="p">]</span>
+    <span class="n">service_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">service_list</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">service_list</span>
 </pre></div>
 
   </div>
@@ -1188,6 +1204,47 @@ table {
       </div>
 
     <h2 class="section-title" id="header-functions">Functions</h2>
+      
+  <div class="item">
+    <div class="name def" id="aid.aid.call_sock_api">
+    <p>def <span class="ident">call_sock_api</span>(</p><p>config, endpoint, **params)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Call sock api and return object created from returned json</p>
+<p>:param config: instance of SockConfig
+:param endpoint: api endpoint for request
+:param params: dict of additional parameters for api request
+:return: api response as python object</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aid.aid.call_sock_api', this);">Show source &equiv;</a></p>
+  <div id="source-aid.aid.call_sock_api" class="source">
+    <div class="codehilite"><pre><span class="k">def</span> <span class="nf">call_sock_api</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Call sock api and return object created from returned json</span>
+
+<span class="sd">    :param config: instance of SockConfig</span>
+<span class="sd">    :param endpoint: api endpoint for request</span>
+<span class="sd">    :param params: dict of additional parameters for api request</span>
+<span class="sd">    :return: api response as python object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
+
+    <span class="n">params</span><span class="p">[</span><span class="s">&quot;token&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">token</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;{host}/api/{endpoint}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="n">endpoint</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
       
   <div class="item">
     <div class="name def" id="aid.aid.entries">
@@ -1221,15 +1278,12 @@ table {
     <span class="k">else</span><span class="p">:</span>
         <span class="n">services</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">:</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">()</span>
-
     <span class="n">last_seen_ts</span> <span class="o">=</span> <span class="n">dateparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">start_date</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">last_seen_ts</span><span class="p">:</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s">&quot;{} - invalid start date&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_date</span><span class="p">))</span>
 
     <span class="n">aid_list</span> <span class="o">=</span> <span class="n">call_sock_api</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s">&#39;aggressive_ips&#39;</span><span class="p">,</span> <span class="n">service</span><span class="o">=</span><span class="s">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">services</span><span class="p">),</span>
-                               <span class="n">last_seen_ts</span><span class="o">=</span><span class="n">last_seen_ts</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">seen_count</span><span class="o">=</span><span class="n">seen_count</span><span class="p">)[</span><span class="s">&#39;aggressive_ips&#39;</span><span class="p">]</span>
+                             <span class="n">last_seen_ts</span><span class="o">=</span><span class="n">last_seen_ts</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">seen_count</span><span class="o">=</span><span class="n">seen_count</span><span class="p">)[</span><span class="s">&#39;aggressive_ips&#39;</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="p">[</span><span class="n">AIDEntry</span><span class="p">(</span><span class="n">ip</span><span class="o">=</span><span class="n">ipaddress</span><span class="o">.</span><span class="n">ip_address</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s">&#39;ip&#39;</span><span class="p">]),</span>
                      <span class="n">tags</span><span class="o">=</span><span class="n">entry</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">],</span>
@@ -1276,6 +1330,70 @@ table {
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">aid_list</span> <span class="o">=</span> <span class="n">entries</span><span class="p">(</span><span class="n">services</span><span class="p">,</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">seen_count</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">ipaddress</span><span class="o">.</span><span class="n">ip_address</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">ip</span><span class="p">)</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">aid_list</span><span class="p">})</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="aid.aid.load_config">
+    <p>def <span class="ident">load_config</span>(</p><p>path=&#39;/Users/mikejones/.aid.json&#39;)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Instantiates a SockConfig object from config file located at path</p>
+<p>:param path: path to config file
+:return: SockConfig object</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aid.aid.load_config', this);">Show source &equiv;</a></p>
+  <div id="source-aid.aid.load_config" class="source">
+    <div class="codehilite"><pre><span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">CONFIG_PATH</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Instantiates a SockConfig object from config file located at path</span>
+
+<span class="sd">    :param path: path to config file</span>
+<span class="sd">    :return: SockConfig object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">SockConfig</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">conf</span><span class="p">[</span><span class="s">&#39;server&#39;</span><span class="p">],</span> <span class="n">token</span><span class="o">=</span><span class="n">conf</span><span class="p">[</span><span class="s">&#39;api_key&#39;</span><span class="p">])</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="aid.aid.services">
+    <p>def <span class="ident">services</span>(</p><p>config=None)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>returns the list of services currently monitored by aid</p>
+<p>:param config:
+:return:</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-aid.aid.services', this);">Show source &equiv;</a></p>
+  <div id="source-aid.aid.services" class="source">
+    <div class="codehilite"><pre><span class="k">def</span> <span class="nf">services</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    returns the list of services currently monitored by aid</span>
+
+<span class="sd">    :param config:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">service_list</span> <span class="o">=</span> <span class="n">call_sock_api</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s">&#39;aggressive_ips/services&#39;</span><span class="p">)[</span><span class="s">&#39;services&#39;</span><span class="p">]</span>
+    <span class="n">service_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">service_list</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">service_list</span>
 </pre></div>
 
   </div>

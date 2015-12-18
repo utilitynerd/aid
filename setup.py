@@ -19,14 +19,15 @@ setup(
     install_requires=[
         'requests',
         'dateparser',
+        'click',
         python2_reqs,
     ],
     extras_require={
-        'iptables': ["Click", "python-iptables"]
+        'iptables': ["python-iptables"]
     },
     entry_points={
-        "console_scripts" : [
-            'aid-iptables=aid.iptables:generate_aid_list [iptables]'
+        "console_scripts": [
+            'aid-list=aid.cli:cli',
         ],
     }
 )

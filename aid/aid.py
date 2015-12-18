@@ -1,10 +1,11 @@
 import os.path
 import sys
 import json
-import requests
 import collections
-import dateparser
+
 import ipaddress
+import dateparser
+import requests
 
 SockConfig = collections.namedtuple("SockConfig", ['host', 'token'])
 AIDEntry = collections.namedtuple("AidEntry", ["ip", "tags", "dst_port", "last_seen_ts",
@@ -59,8 +60,6 @@ def entries(services=None, start_date="1 week ago", seen_count=10, config=None):
     else:
         services = []
 
-
-
     last_seen_ts = dateparser.parse(start_date)
     if not last_seen_ts:
         sys.exit("{} - invalid start date".format(start_date))
@@ -102,4 +101,3 @@ def services(config=None):
     service_list = call_sock_api(config, 'aggressive_ips/services')['services']
     service_list = [entry['name'] for entry in service_list]
     return service_list
-
