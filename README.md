@@ -2,6 +2,8 @@
 
 ## Installation
 
+##### NOTE: The aid module was developed and tested using Python 3.5.x.  It should run under Python 2.7.11, but please report any issues encounterd.
+
 To install the latest aid module, run:
 
     pip install -U aid
