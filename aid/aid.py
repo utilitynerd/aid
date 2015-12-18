@@ -13,7 +13,7 @@ AIDEntry = collections.namedtuple("AidEntry", ["ip", "tags", "dst_port", "last_s
 CONFIG_PATH = os.path.join(os.path.expanduser("~"), ".aid.json")
 
 
-def __call_sock_api(config, endpoint, **params):
+def call_sock_api(config, endpoint, **params):
     """
     Call sock api and return object created from returned json
 
@@ -22,6 +22,9 @@ def __call_sock_api(config, endpoint, **params):
     :param params: dict of additional parameters for api request
     :return: api response as python object
     """
+    if not config:
+        config = load_config()
+
     params["token"] = config.token
     url = "{host}/api/{endpoint}".format(host=config.host, endpoint=endpoint)
     r = requests.get(url, timeout=20, params=params)
@@ -29,7 +32,7 @@ def __call_sock_api(config, endpoint, **params):
     return json.loads(r.text)
 
 
-def __load_config(path=CONFIG_PATH):
+def load_config(path=CONFIG_PATH):
     """
     Instantiates a SockConfig object from config file located at path
 
@@ -56,15 +59,14 @@ def entries(services=None, start_date="1 week ago", seen_count=10, config=None):
     else:
         services = []
 
-    if not config:
-        config = __load_config()
+
 
     last_seen_ts = dateparser.parse(start_date)
     if not last_seen_ts:
         sys.exit("{} - invalid start date".format(start_date))
 
-    aid_list = __call_sock_api(config, 'aggressive_ips', service=",".join(services),
-                               last_seen_ts=last_seen_ts.isoformat(), seen_count=seen_count)['aggressive_ips']
+    aid_list = call_sock_api(config, 'aggressive_ips', service=",".join(services),
+                             last_seen_ts=last_seen_ts.isoformat(), seen_count=seen_count)['aggressive_ips']
 
     return [AIDEntry(ip=ipaddress.ip_address(entry['ip']),
                      tags=entry['tags'],
@@ -88,3 +90,16 @@ def ips(services=None, start_date="1 week ago", seen_count=10, config=None):
     """
     aid_list = entries(services, start_date, seen_count, config)
     return sorted({ipaddress.ip_address(entry.ip) for entry in aid_list})
+
+
+def services(config=None):
+    """
+    returns the list of services currently monitored by aid
+
+    :param config:
+    :return:
+    """
+    service_list = call_sock_api(config, 'aggressive_ips/services')['services']
+    service_list = [entry['name'] for entry in service_list]
+    return service_list
+
