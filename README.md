@@ -1,4 +1,4 @@
-# Note: Current, the aid module only support IPv4
+# Note: Currently, the aid module only support IPv4
 
 ## Installation
 
