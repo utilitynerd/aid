@@ -67,14 +67,15 @@ def entries(services=None, start_date="1 week ago", seen_count=10, config=None):
     aid_list = call_sock_api(config, 'aggressive_ips', service=",".join(services),
                              last_seen_ts=last_seen_ts.isoformat(), seen_count=seen_count)['aggressive_ips']
 
-    return [AIDEntry(ip=ipaddress.ip_address(entry['ip']),
+    res = (AIDEntry(ip=ipaddress.ip_address(entry['ip']),
                      tags=entry['tags'],
                      dst_port=entry['dst_port'],
                      last_seen_ts=entry['last_seen_ts'],
                      first_seen_ts=entry['first_seen_ts'],
                      service=entry['service'],
                      seen_count=entry["seen_count"])
-            for entry in aid_list]
+            for entry in aid_list )
+    return [entry for entry in res if entry.ip.version == 4]
 
 
 def ips(services=None, start_date="1 week ago", seen_count=10, config=None):

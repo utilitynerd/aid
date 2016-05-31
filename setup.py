@@ -1,6 +1,7 @@
 from setuptools import  setup, find_packages
 import sys
 
+
 # If python2, install ipaddress package
 python2_reqs = ""
 if sys.version_info[0] == 2:
@@ -8,7 +9,7 @@ if sys.version_info[0] == 2:
 
 setup(
     name='aid',
-    version='0.1.0',
+    version='0.1.1',
     url='https://github.com/utilitynerd/aid',
     license='Educational Community License, Version 2.0',
     author='Mike Jones',
