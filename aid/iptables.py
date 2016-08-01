@@ -1,5 +1,9 @@
 import ipaddress
+import os
 import sys
+import pickle
+import datetime
+import dateparser
 
 import aid
 
@@ -125,14 +129,48 @@ def fetch_aid_list(services=None, start_date='1 week', seen_count=10):
     return bad_ips
 
 
-def generate_aid_list(services=None, start_date='1 week', seen_count=10, whitelist=None, chain_name='aid',
+def cache_valid(cache_filename, cache_age):
+    # If no cache file was specified, the cache is always invalid
+    if not cache_filename: return False
+
+    if cache_filename and os.path.exists(cache_filename):
+        cache_age_ts = dateparser.parse(cache_age)
+        # Get the cache's modification timestamp; utc for dateparser comparison
+        mtime = datetime.datetime.utcfromtimestamp(
+            os.path.getmtime(cache_filename))
+        # If the current timestamp is more than our time window (now - time ago)
+        # we have a valid cache file.
+        if mtime > cache_age_ts:
+            return True
+
+    return False
+
+def write_aid_list_cache(cache_filename, ips):
+    f = open(cache_filename, 'wb')
+    pickle.dump(ips, f)
+    f.close()
+
+def read_aid_list_cache(cache_filename):
+    f = open(cache_filename, 'rb')
+    ips = pickle.load(f)
+    f.close()
+    return ips
+
+def generate_aid_list(services=None, start_date='1 week', seen_count=10, whitelist=None, cache_filename=None, cache_age='1 day ago', chain_name='aid',
                       input_chain_position=0):
-    # Try to fetch the aid list first, any error will stop the program leaving current
-    # IPTables rules in place
-    ips = fetch_aid_list(services=services, start_date=start_date, seen_count=seen_count)
-    prepare_aid_chain(chain_name)
-    if whitelist:
-        whitelisted_nets = load_whitelist(whitelist)
-        ips = remove_whitelisted_ips(ips, whitelisted_nets)
-    add_block_rules_to_chain(ips, chain_name)
-    add_aid_chain_to_input(chain_name, input_chain_position)
+    if cache_valid(cache_filename, cache_age):
+        ips = read_aid_list_cache(cache_filename)
+    else:
+        # Try to fetch the aid list first, any error will stop the program
+        # leaving current IPTables rules in place
+        ips = fetch_aid_list(services=services, start_date=start_date, seen_count=seen_count)
+        if cache_filename:
+            write_aid_list_cache(cache_filename, ips)
+    #prepare_aid_chain(chain_name)
+    #if whitelist:
+    #    whitelisted_nets = load_whitelist(whitelist)
+    #    ips = remove_whitelisted_ips(ips, whitelisted_nets)
+    #add_block_rules_to_chain(ips, chain_name)
+    #add_aid_chain_to_input(chain_name, input_chain_position)
+
+# vim: set et ts=4 sw=4
