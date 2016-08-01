@@ -166,11 +166,11 @@ def generate_aid_list(services=None, start_date='1 week', seen_count=10, whiteli
         ips = fetch_aid_list(services=services, start_date=start_date, seen_count=seen_count)
         if cache_filename:
             write_aid_list_cache(cache_filename, ips)
-    #prepare_aid_chain(chain_name)
-    #if whitelist:
-    #    whitelisted_nets = load_whitelist(whitelist)
-    #    ips = remove_whitelisted_ips(ips, whitelisted_nets)
-    #add_block_rules_to_chain(ips, chain_name)
-    #add_aid_chain_to_input(chain_name, input_chain_position)
+    prepare_aid_chain(chain_name)
+    if whitelist:
+        whitelisted_nets = load_whitelist(whitelist)
+        ips = remove_whitelisted_ips(ips, whitelisted_nets)
+    add_block_rules_to_chain(ips, chain_name)
+    add_aid_chain_to_input(chain_name, input_chain_position)
 
 # vim: set et ts=4 sw=4
