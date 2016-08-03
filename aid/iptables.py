@@ -156,7 +156,7 @@ def read_aid_list_cache(cache_filename):
     f.close()
     return ips
 
-def generate_aid_list(services=None, start_date='1 week', seen_count=10, whitelist=None, cache_filename=None, cache_age='1 day ago', chain_name='aid',
+def generate_aid_list(services=None, start_date='1 week', seen_count=10, whitelist=None, cache_filename=None, cache_age='1 day ago', write=False, chain_name='aid',
                       input_chain_position=0):
     if cache_valid(cache_filename, cache_age):
         ips = read_aid_list_cache(cache_filename)
@@ -164,7 +164,7 @@ def generate_aid_list(services=None, start_date='1 week', seen_count=10, whiteli
         # Try to fetch the aid list first, any error will stop the program
         # leaving current IPTables rules in place
         ips = fetch_aid_list(services=services, start_date=start_date, seen_count=seen_count)
-        if cache_filename:
+        if cache_filename and write:
             write_aid_list_cache(cache_filename, ips)
     prepare_aid_chain(chain_name)
     if whitelist:

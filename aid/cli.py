@@ -74,8 +74,10 @@ def services_cli():
 @click.option('--input-chain-pos', 'input_chain_position', default=1, type=click.INT,
               help="default=0 - Position in INPUT chain to add a jump to the aid chain")
 @click.option('--cache', 'cache_filename', default=None,
-              type=click.Path(exists=False, file_okay=True, dir_okay=False, writable=True, readable=True, resolve_path=True),
-              help="Read or write a cache file containing AID JSON")
+              type=click.Path(exists=False, file_okay=True, dir_okay=False, writable=False, readable=True, resolve_path=True),
+              help="Specify cache file containing pickled AID list")
+@click.option('--write/--no-write', default=False,
+              help="default=False - Write cache file")
 @click.option('--cache-age', default='1 day ago',
               help="default='1 day ago' - Retain cache if it is newer than cache-age ")
 def iptables(**kwargs):
