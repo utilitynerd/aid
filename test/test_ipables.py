@@ -6,12 +6,15 @@ import iptc
 test_ips = [ipaddress.ip_address(ip) for ip in ['192.0.2.2', '198.51.100.50', '203.0.113.22']]
 test_whitelist_nets = [ipaddress.ip_network(net) for net in ['192.0.2.2', '192.0.2.1', '203.0.113.0/24']]
 
+
 def reset_iptables():
     table = iptc.Table(iptc.Table.FILTER)
     table.flush()
 
+
 def list_rules_in_chain(chain_name):
     return [rule for rule in iptc.Chain(table, chain_name).rules]
+
 
 @pytest.fixture(scope="function")
 def setup_teardown(request):
@@ -24,7 +27,7 @@ def create_whitelist(tmpdir):
     """
     Creates whitelist in tmp location and returns its file object
     """
-    whitelist= os.path.join(str(tmpdir), 'whitelist')
+    whitelist = os.path.join(str(tmpdir), 'whitelist')
     with open(whitelist, 'w') as f:
         f.writelines("\n".join(str(net) for net in test_whitelist_nets))
     return whitelist
@@ -33,7 +36,7 @@ def create_whitelist(tmpdir):
 def test_prepare_new_aid_chain(setup_teardown):
     assert table.is_chain('aid') is False
     prepare_aid_chain('aid')
-    assert table.is_chain('aid') == True
+    assert table.is_chain('aid')
 
 
 def test_add_block_rules_to_chain(setup_teardown):
