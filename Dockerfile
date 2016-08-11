@@ -28,11 +28,8 @@ RUN echo "root:root" | chpasswd
 # Needed to test aid-iptables integration
 RUN yum -y install iptables; yum clean all
 
-ADD . /aid
-
-RUN pip3.5 install -e /aid
-RUN pip3.5 install pytest python-iptables
-
+# Install pytest
+RUN pip3.5 install pytest
 
 EXPOSE 22
-CMD ["/usr/sbin/sshd", "-D"]
+CMD pip3.5 install -e /aid[iptables] && /usr/sbin/sshd -D
