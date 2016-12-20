@@ -30,7 +30,7 @@ setup(
         'requests',
         'dateparser',
         'click',
-        'convertdate<=2.0.7'
+        'convertdate<=2.0.7',
         python2_reqs,
     ],
     extras_require={
