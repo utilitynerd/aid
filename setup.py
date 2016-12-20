@@ -9,7 +9,7 @@ if sys.version_info[0] == 2:
 
 setup(
     name='aid',
-    version='0.1.1',
+    version='0.1.2',
     url='https://github.com/utilitynerd/aid',
     license='Educational Community License, Version 2.0',
     author='Mike Jones',
