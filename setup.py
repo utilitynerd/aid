@@ -9,7 +9,7 @@ if sys.version_info[0] == 2:
 
 setup(
     name='aid',
-    version='0.1.2',
+    version='0.1.3',
     url='https://github.com/utilitynerd/aid',
     license='Educational Community License, Version 2.0',
     author='Mike Jones',
@@ -30,7 +30,7 @@ setup(
         'requests',
         'dateparser',
         'click',
-        'convertdate<=2.0.7',
+        'pytz<=2016',
         python2_reqs,
     ],
     extras_require={
