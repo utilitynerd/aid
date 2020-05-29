@@ -31,8 +31,8 @@ def call_sock_api(config, endpoint, **params):
     url = "{host}/api/{endpoint}".format(host=config.host, endpoint=endpoint)
     attempts = 0
     while attempts < 6:
+        r = requests.get(url, timeout=20, params=params)
         try:
-            r = requests.get(url, timeout=20, params=params)
             r.raise_for_status()
         except:
             time.sleep(10)
