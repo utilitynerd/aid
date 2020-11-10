@@ -2,6 +2,7 @@ import os.path
 import sys
 import json
 import collections
+import time
 
 import ipaddress
 import dateparser
@@ -28,9 +29,16 @@ def call_sock_api(config, endpoint, **params):
 
     params["token"] = config.token
     url = "{host}/api/{endpoint}".format(host=config.host, endpoint=endpoint)
-    r = requests.get(url, timeout=20, params=params)
-    r.raise_for_status()
-    return json.loads(r.text)
+    attempts = 0
+    while attempts < 6:
+        r = requests.get(url, timeout=20, params=params)
+        try:
+            r.raise_for_status()
+        except:
+            time.sleep(10)
+        finally:
+            return json.loads(r.text)
+    raise Exception(f"Reached {attempts} attempts on {url}.")
 
 
 def load_config(path=CONFIG_PATH):
