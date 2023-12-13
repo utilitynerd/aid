@@ -1,11 +1,12 @@
+import collections
+import json
 import os.path
 import sys
-import json
-import collections
 import time
 
 import ipaddress
-import dateparser
+
+from dateutil.parser import parse
 import requests
 
 SockConfig = collections.namedtuple("SockConfig", ['host', 'token'])
@@ -68,7 +69,7 @@ def entries(services=None, start_date="1 week ago", seen_count=10, config=None):
     else:
         services = []
 
-    last_seen_ts = dateparser.parse(start_date)
+    last_seen_ts = parse(start_date, fuzzy_with_tokens=True)
     if not last_seen_ts:
         sys.exit("{} - invalid start date".format(start_date))
 

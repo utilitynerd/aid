@@ -1,13 +1,13 @@
+import datetime
 import ipaddress
 import os
-import sys
 import pickle
-import datetime
-import dateparser
+import sys
+
+from dateutil.parser import parse
+import requests
 
 import aid
-
-import requests
 
 try:
     import iptc
@@ -134,7 +134,7 @@ def cache_valid(cache_filename, cache_age):
     if not cache_filename: return False
 
     if cache_filename and os.path.exists(cache_filename):
-        cache_age_ts = dateparser.parse(cache_age)
+        cache_age_ts = parse(cache_age)
         # Get the cache's modification timestamp; utc for dateparser comparison
         mtime = datetime.datetime.utcfromtimestamp(
             os.path.getmtime(cache_filename))

@@ -28,9 +28,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         'requests',
-        'dateparser',
+        'dateutil',
         'click',
-        'pytz<=2016',
         python2_reqs,
     ],
     extras_require={
