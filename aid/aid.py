@@ -5,6 +5,7 @@ import sys
 import time
 
 import ipaddress
+from datetime import date
 
 from dateutil.parser import parse
 import requests
@@ -74,7 +75,7 @@ def entries(services=None, start_date="1 week ago", seen_count=10, config=None):
         sys.exit("{} - invalid start date".format(start_date))
 
     aid_list = call_sock_api(config, 'aggressive_ips', service=",".join(services),
-                             last_seen_ts=last_seen_ts.isoformat(), seen_count=seen_count)['aggressive_ips']
+                             last_seen_ts=date.isoformat(last_seen_ts), seen_count=seen_count)['aggressive_ips']
 
     res = (AIDEntry(ip=ipaddress.ip_address(entry['ip']),
                      tags=entry['tags'],
